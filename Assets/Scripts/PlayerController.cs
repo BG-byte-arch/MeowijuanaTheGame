@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 input;
     
+    private float testvar01;
+
     private void Update()
     {
         if (!isMoving)
