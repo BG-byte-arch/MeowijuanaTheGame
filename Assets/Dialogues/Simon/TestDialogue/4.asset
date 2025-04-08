@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 1
+  m_Script: {fileID: 11500000, guid: 00a7746b2b97488796d6c0435e0bcf7a, type: 3}
+  m_Name: 4
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
   character: {fileID: 11400000, guid: 94bca7b9231a7d4a495d7c6e4db9b3a8, type: 2}
-  sentence: Hey kid.
-  letterDelay: 0.2
+  sentence: See you never.
+  letterDelay: 0.05
   unskippable: 0
   autoEnd: 0

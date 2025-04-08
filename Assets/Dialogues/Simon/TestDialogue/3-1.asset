@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 3-1
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
   character: {fileID: 11400000, guid: 94bca7b9231a7d4a495d7c6e4db9b3a8, type: 2}
-  sentence: That's JUST great.
-  letterDelay: 0.2
+  sentence: Great..
+  letterDelay: 0.05
   unskippable: 0
   autoEnd: 0

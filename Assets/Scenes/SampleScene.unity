@@ -601,11 +601,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listOfDialogues:
-    name: 
+    name: Simon
     dialogues:
     - {fileID: 11400000, guid: 4acb039b0b984928398669a498ae5a3e, type: 2}
     - {fileID: 11400000, guid: 52de4d0793bd1954aad75c2e2bb6e01e, type: 2}
     - {fileID: 11400000, guid: f70f914167be9ebf49a283084d760e65, type: 2}
+    - {fileID: 11400000, guid: b38818161faa4fe1d899aefa6745f1d9, type: 2}
   dialogueBox: {fileID: 1485435874}
 --- !u!50 &363692812
 Rigidbody2D:

@@ -1,71 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
-
-[Serializable]
-public abstract class BaseDialogue: ScriptableObject
-{
-    public DialogueCharacter character;
-    public string sentence;
-    public float letterDelay;
-}
-    
-
-[CreateAssetMenu(fileName = "NewDialogue", menuName = "Dialogues/Basic Dialogue")]
-public class Dialogue : BaseDialogue
-{
-    public bool unskippable;
-    public bool autoEnd;
-    public Dialogue(DialogueCharacter character, string sentence, float letterDelay = 0.05f, bool unskippable = false, bool autoEnd = false)
-    {
-        this.character = character;
-        this.sentence = sentence;
-        this.letterDelay = letterDelay;
-        this.unskippable = unskippable; // manually use ContinueDialogue to continue
-        this.autoEnd = autoEnd;
-    }
-}
-
-
-[Serializable]
-public class DialogueQueue
-{
-    public string name;
-    public List<BaseDialogue> dialogues;
-
-    public DialogueQueue(List<BaseDialogue> dialogues, string name)
-    {
-        this.dialogues = dialogues;
-        this.name = name;
-    }
-}
-
-
-[CreateAssetMenu(fileName = "NewOptionDialogue", menuName = "Dialogues/Option Dialogue")]
-public class OptionDialogue : BaseDialogue
-{
-    public List<DialogueQueue> options;
-
-    public OptionDialogue(DialogueCharacter character, string sentence, float letterDelay, List<DialogueQueue> options)
-    {
-        this.character = character;
-        this.sentence = sentence;
-        this.letterDelay = letterDelay;
-        this.options = options;
-    }
-}
-
-[CreateAssetMenu(fileName = "NewDialogueCharacter", menuName = "Dialogues/Dialogue Character")]
-public class DialogueCharacter : ScriptableObject
-{
-    new public string name;
-    public Sprite portrait;
-    public Sprite portraitTalk;
-}
 
 public class DialogueBox : MonoBehaviour
 {
@@ -73,7 +11,7 @@ public class DialogueBox : MonoBehaviour
     bool dialogueEnded;
     private int characterCount;
     private float timer;
-    public Queue<BaseDialogue> sentences;
+    public LinkedList<BaseDialogue> sentences;
     InputAction continueAction;
     new public TMP_Text name;
     public TMP_Text sentence;
@@ -85,27 +23,28 @@ public class DialogueBox : MonoBehaviour
     public GameObject dialogueOptionButton;
     void Start()
     {
-        sentences = new Queue<BaseDialogue>();
+        sentences = new LinkedList<BaseDialogue>();
         continueAction = InputSystem.actions.FindAction("ContinueDialogue");
     }
 
     // Update is called once per frame
     public void ContinueDialogue()
     {
-        sentences.Dequeue();
+        sentences.RemoveFirst();
         characterCount = 0;
         dialogueEnded = false;
     }
 
     public void AddDialogue(DialogueQueue queue)
     {
-        foreach (var dialogue in queue.dialogues)
+        for (int i = queue.dialogues.Count - 1; i >= 0; i--)
         {
-            sentences.Enqueue(dialogue);
+            sentences.AddFirst(queue.dialogues[i]);
         }
 
         dialogueActive = true;
     }
+
 
     private bool toggle;
     void Update()
@@ -114,25 +53,25 @@ public class DialogueBox : MonoBehaviour
         if (sentences.Count == 0) dialogueActive = false;
         name.enabled = dialogueActive;
         portrait.enabled = dialogueActive;
-        panel.enabled = dialogueActive && sentences.Peek() is Dialogue;
-        sentence.enabled = dialogueActive && sentences.Peek() is Dialogue;
-        optionPanel.enabled = dialogueActive && sentences.Peek() is OptionDialogue;
-        optionSentence.enabled = dialogueActive && sentences.Peek() is OptionDialogue;
+        panel.enabled = dialogueActive && sentences.First() is Dialogue;
+        sentence.enabled = dialogueActive && sentences.First() is Dialogue;
+        optionPanel.enabled = dialogueActive && sentences.First() is OptionDialogue;
+        optionSentence.enabled = dialogueActive && sentences.First() is OptionDialogue;
         if (sentences.Count == 0) return; 
-        name.text = sentences.Peek().character.name;
-        if (!dialogueEnded && timer >= sentences.Peek().letterDelay)
+        name.text = sentences.First().character.name;
+        if (!dialogueEnded && timer >= sentences.First().letterDelay)
         {
-            if (sentences.Peek() is Dialogue dialogue)
+            if (sentences.First() is Dialogue dialogue)
             {
-                if (characterCount == sentences.Peek().sentence.Length || (!dialogue.unskippable && continueAction.WasPressedThisFrame()))
+                if (characterCount == sentences.First().sentence.Length || (!dialogue.unskippable && continueAction.WasPressedThisFrame()))
                 {
                     dialogueEnded = true;
                     if (dialogue.autoEnd) ContinueDialogue();
                 }
             }
-            else if (sentences.Peek() is OptionDialogue optionDialogue)
+            else if (sentences.First() is OptionDialogue optionDialogue)
             {
-                if (characterCount == sentences.Peek().sentence.Length || continueAction.WasPressedThisFrame())
+                if (characterCount == sentences.First().sentence.Length || continueAction.WasPressedThisFrame())
                 {
                     dialogueEnded = true;
                     foreach (var option in optionDialogue.options)
@@ -141,8 +80,8 @@ public class DialogueBox : MonoBehaviour
                         TMP_Text optionText = optionObj.GetComponentInChildren<TMP_Text>();
                         optionObj.onClick.AddListener(() =>
                         {
-                            AddDialogue(option);
                             ContinueDialogue();
+                            AddDialogue(option);
                             foreach (Transform child in optionGameObject.transform)
                             {
                                 Destroy(child.gameObject);
@@ -152,23 +91,27 @@ public class DialogueBox : MonoBehaviour
                     }
                 }
             }
-            if (characterCount < sentences.Peek().sentence.Length)
+            if (characterCount < sentences.First().sentence.Length)
             {
                 toggle = !toggle;
                 characterCount++;
                 timer = 0;
+                if (sentences.First().letterDelay == 0)
+                {
+                    characterCount = sentences.First().sentence.Length;
+                }
             }
-            portrait.sprite = toggle ? sentences.Peek().character.portrait : sentences.Peek().character.portraitTalk;
+            portrait.sprite = toggle ? sentences.First().character.portrait : sentences.First().character.portraitTalk;
         }
         else if (dialogueEnded)
         {
-            portrait.sprite = sentences.Peek().character.portrait;
-            if (sentences.Peek() is Dialogue dialogue)
+            portrait.sprite = sentences.First().character.portrait;
+            if (sentences.First() is Dialogue dialogue)
             {
                 if (continueAction.WasPressedThisFrame() && !dialogue.unskippable) ContinueDialogue();
             }
         }
-        sentence.text = sentences.Peek().sentence.Substring(0, characterCount);
-        optionSentence.text = sentences.Peek().sentence.Substring(0, characterCount);
+        sentence.text = sentences.First().sentence.Substring(0, characterCount);
+        optionSentence.text = sentences.First().sentence.Substring(0, characterCount);
     }
 }

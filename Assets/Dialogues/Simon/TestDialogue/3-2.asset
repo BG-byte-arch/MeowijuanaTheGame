@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 3-2
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
   character: {fileID: 11400000, guid: 94bca7b9231a7d4a495d7c6e4db9b3a8, type: 2}
-  sentence: YOU? Threatening ME? Simpleton.
+  sentence: Please die in a fire
   letterDelay: 0.05
   unskippable: 0
   autoEnd: 0

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: Assembly-CSharp::OptionDialogue
   character: {fileID: 11400000, guid: 94bca7b9231a7d4a495d7c6e4db9b3a8, type: 2}
-  sentence: Do you want to die?
-  letterDelay: 0.05
+  sentence: Want some nips, kid?
+  letterDelay: 0
   options:
-  - name: Sounds fun!
+  - name: Sure!
     dialogues:
     - {fileID: 11400000, guid: d1598f46bb85839259252fe8c02655e3, type: 2}
-  - name: How about YOU die
+  - name: Fuck off
     dialogues:
     - {fileID: 11400000, guid: 3d21f762e61dfe30abe119c3ed951e97, type: 2}
